@@ -28,7 +28,6 @@
             position: relative;
         }
 
-        /* Floating hearts background */
         .heart-bg {
             position: fixed;
             width: 100%;
@@ -187,7 +186,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            position: relative;
         }
 
         #yesBtn {
@@ -213,8 +211,12 @@
         #noBtn {
             background: #ddd;
             color: #666;
-            position: absolute;
             transition: all 0.2s ease;
+        }
+
+        #noBtn.dodging {
+            position: fixed;
+            z-index: 9999;
         }
 
         #noBtn.shrink {
@@ -318,6 +320,41 @@
                 opacity: 0;
             }
         }
+
+        .rose-petal {
+            position: fixed;
+            font-size: 30px;
+            top: -50px;
+            animation: petal-fall 4s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes petal-fall {
+            0% {
+                transform: translateY(0) rotate(0deg) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .ring-emoji {
+            display: inline-block;
+            font-size: 4em;
+            animation: ring-shine 2s infinite;
+        }
+
+        @keyframes ring-shine {
+            0%, 100% {
+                transform: rotate(-10deg) scale(1);
+            }
+            50% {
+                transform: rotate(10deg) scale(1.1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -328,7 +365,7 @@
             <h1>💖 Veux-tu être ma Valentine ? 💖</h1>
             
             <div class="image-container">
-                <div class="sushi-emoji">🍣</div>
+                <img src="https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif" alt="Romantic hearts" style="max-width: 300px; border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 107, 157, 0.3);">
             </div>
 
             <div class="details">
@@ -372,13 +409,16 @@
             <div class="final-screen">
                 <h1>YAAAAY ! 🎊</h1>
                 
+                <div class="ring-emoji">💍</div>
+                
                 <div class="gif-container">
                     <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGx3aHF6cjBvOHN5anM2ZDI2anl6bHFqNnU2cGl6ZHJ6dGV6Y3o4YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif" alt="Happy celebration">
                 </div>
                 
                 <div class="final-message">
-                    J'ai trop hâte ! 💖<br>
-                    Le 14 février sera magique ! ✨
+                    Elle a dit OUI ! 💖<br>
+                    J'ai trop hâte ! ✨<br>
+                    Le 14 février sera magique ! 🌹
                 </div>
             </div>
         </div>
@@ -404,32 +444,36 @@
         let shrinkCount = 0;
 
         noBtn.addEventListener('mouseenter', () => {
-            const container = document.querySelector('.buttons');
-            const containerRect = container.getBoundingClientRect();
-            
             clickCount++;
             
-            if (clickCount <= 3) {
-                const maxX = containerRect.width - noBtn.offsetWidth;
-                const maxY = containerRect.height - noBtn.offsetHeight;
-                
+            if (clickCount === 1) {
+                noBtn.classList.add('dodging');
+            }
+            
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            
+            if (clickCount <= 5) {
                 const randomX = Math.random() * maxX;
                 const randomY = Math.random() * maxY;
                 
                 noBtn.style.left = randomX + 'px';
                 noBtn.style.top = randomY + 'px';
-            } else if (clickCount <= 6) {
+            } else if (clickCount <= 10) {
                 shrinkCount++;
-                noBtn.style.transform = `scale(${1 - shrinkCount * 0.15})`;
+                const randomX = Math.random() * maxX;
+                const randomY = Math.random() * maxY;
+                
+                noBtn.style.left = randomX + 'px';
+                noBtn.style.top = randomY + 'px';
+                noBtn.style.transform = `scale(${1 - shrinkCount * 0.12})`;
             } else {
                 noBtn.style.opacity = '0';
                 setTimeout(() => {
-                    const maxX = containerRect.width - noBtn.offsetWidth;
-                    const maxY = containerRect.height - noBtn.offsetHeight;
                     noBtn.style.left = Math.random() * maxX + 'px';
                     noBtn.style.top = Math.random() * maxY + 'px';
                     noBtn.style.opacity = '1';
-                }, 300);
+                }, 200);
             }
         });
 
@@ -476,6 +520,21 @@
                     
                     setTimeout(() => confetti.remove(), 3000);
                 }, i * 50);
+            }
+            
+            const petals = ['🌹', '🌺', '💐', '🌸', '💮'];
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const petal = document.createElement('div');
+                    petal.className = 'rose-petal';
+                    petal.textContent = petals[Math.floor(Math.random() * petals.length)];
+                    petal.style.left = Math.random() * 100 + '%';
+                    petal.style.animationDelay = Math.random() * 2 + 's';
+                    petal.style.animationDuration = (3 + Math.random() * 2) + 's';
+                    document.body.appendChild(petal);
+                    
+                    setTimeout(() => petal.remove(), 6000);
+                }, i * 100);
             }
         });
     </script>
